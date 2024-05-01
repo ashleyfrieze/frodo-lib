@@ -3,5 +3,7 @@
     ["@babel/preset-env", { "targets": { "node": "16" }, "modules": false }],
     "@babel/preset-typescript"
   ],
-  "plugins": [["babel-plugin-add-import-extension"]]
+  "plugins": [
+    ["babel-plugin-add-import-extension"]   
+  ]
 }

@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath, URL } from 'url';
+import { URL } from 'url';
 import util from 'util';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -39,6 +39,12 @@ import {
 import { accessTokenRfc7523AuthZGrant } from './OAuth2OidcOps';
 import { updateOAuth2TrustedJwtIssuer } from './OAuth2TrustedJwtIssuerOps';
 import { getRealmManagedOrganization } from './OrganizationOps';
+import GENERIC_EXTENSION_ATTRIBUTES from './templates/cloud/GenericExtensionAttributesTemplate.json';
+import oauthClient from './templates/OAuth2ClientTemplate.json';
+import oauth2Issuer from './templates/OAuth2TrustedJwtIssuerTemplate.json';
+
+const OAUTH2_CLIENT = oauthClient as OAuth2ClientSkeleton;
+const OAUTH2_ISSUER = oauth2Issuer as OAuth2TrustedJwtIssuerSkeleton;
 
 export type Admin = {
   generateRfc7523AuthZGrantArtefacts(
@@ -336,30 +342,6 @@ export default (state: State): Admin => {
     },
   };
 };
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
-const OAUTH2_CLIENT: OAuth2ClientSkeleton = JSON.parse(
-  fs.readFileSync(
-    path.resolve(__dirname, './templates/OAuth2ClientTemplate.json'),
-    'utf8'
-  )
-);
-const OAUTH2_ISSUER: OAuth2TrustedJwtIssuerSkeleton = JSON.parse(
-  fs.readFileSync(
-    path.resolve(__dirname, './templates/OAuth2TrustedJwtIssuerTemplate.json'),
-    'utf8'
-  )
-);
-const GENERIC_EXTENSION_ATTRIBUTES = JSON.parse(
-  fs.readFileSync(
-    path.resolve(
-      __dirname,
-      './templates/cloud/GenericExtensionAttributesTemplate.json'
-    ),
-    'utf8'
-  )
-);
 
 const protectedClients = ['ui', 'idm-provisioning'];
 const protectedSubjects = ['amadmin', 'autoid-resource-server'];

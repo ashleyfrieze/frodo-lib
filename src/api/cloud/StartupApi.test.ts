@@ -12,9 +12,8 @@ import * as StartupApi from './StartupApi';
 import { state } from '../../index';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+import ready from '../../test/mocks/StartupApi/getStatus/ready.json';
+import restarting from '../../test/mocks/StartupApi/getStatus/restarting.json';
 
 const mock = new MockAdapter(axios);
 
@@ -30,36 +29,18 @@ state.setUserSessionTokenMeta({
 
 describe('StartupApi - getStatus()', () => {
   test('getStatus() 1: Get restart status - expect "ready"', async () => {
-    const response = JSON.parse(
-      fs.readFileSync(
-        path.resolve(
-          __dirname,
-          '../../test/mocks/StartupApi/getStatus/ready.json'
-        ),
-        'utf8'
-      )
-    );
     mock
       .onGet('https://openam-frodo-dev.forgeblocks.com/environment/startup')
-      .reply(200, response);
+      .reply(200, ready);
     const status = await StartupApi.getStatus({ state });
     expect(status in StartupApi.RestartStatus).toBeTruthy();
     expect(status).toBe(StartupApi.RestartStatus.ready);
   });
 
   test('getStatus() 2: Get restart status - expect "restarting"', async () => {
-    const response = JSON.parse(
-      fs.readFileSync(
-        path.resolve(
-          __dirname,
-          '../../test/mocks/StartupApi/getStatus/restarting.json'
-        ),
-        'utf8'
-      )
-    );
     mock
       .onGet('https://openam-frodo-dev.forgeblocks.com/environment/startup')
-      .reply(200, response);
+      .reply(200, restarting);
     const status = await StartupApi.getStatus({ state });
     expect(status in StartupApi.RestartStatus).toBeTruthy();
     expect(status).toBe(StartupApi.RestartStatus.restarting);
@@ -68,64 +49,28 @@ describe('StartupApi - getStatus()', () => {
 
 describe('StartupApi - initiateRestart()', () => {
   test('initiateRestart() 1: Initiate restart - expect "ready" -> "restarting"', async () => {
-    const response1 = JSON.parse(
-      fs.readFileSync(
-        path.resolve(
-          __dirname,
-          '../../test/mocks/StartupApi/getStatus/ready.json'
-        ),
-        'utf8'
-      )
-    );
     mock
       .onGet('https://openam-frodo-dev.forgeblocks.com/environment/startup')
-      .reply(200, response1);
-    const response2 = JSON.parse(
-      fs.readFileSync(
-        path.resolve(
-          __dirname,
-          '../../test/mocks/StartupApi/initiateRestart/restarting.json'
-        ),
-        'utf8'
-      )
-    );
+      .reply(200, ready);
     mock
       .onPost(
         'https://openam-frodo-dev.forgeblocks.com/environment/startup?_action=restart'
       )
-      .reply(200, response2);
+      .reply(200, restarting);
     const status = await StartupApi.initiateRestart({ state });
     expect(status in StartupApi.RestartStatus).toBeTruthy();
     expect(status).toBe(StartupApi.RestartStatus.restarting);
   });
 
   test('initiateRestart() 2: Initiate restart - expect "restarting" -> exception', async () => {
-    const response1 = JSON.parse(
-      fs.readFileSync(
-        path.resolve(
-          __dirname,
-          '../../test/mocks/StartupApi/getStatus/restarting.json'
-        ),
-        'utf8'
-      )
-    );
     mock
       .onGet('https://openam-frodo-dev.forgeblocks.com/environment/startup')
-      .reply(200, response1);
-    const response2 = JSON.parse(
-      fs.readFileSync(
-        path.resolve(
-          __dirname,
-          '../../test/mocks/StartupApi/initiateRestart/restarting.json'
-        ),
-        'utf8'
-      )
-    );
+      .reply(200, restarting);
     mock
       .onPost(
         'https://openam-frodo-dev.forgeblocks.com/environment/startup?_action=restart'
       )
-      .reply(200, response2);
+      .reply(200, restarting);
     expect.assertions(2);
     try {
       await StartupApi.initiateRestart({ state });

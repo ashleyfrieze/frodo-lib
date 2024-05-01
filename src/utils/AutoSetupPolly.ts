@@ -3,9 +3,7 @@ import { Polly } from '@pollyjs/core';
 import FSPersister from '@pollyjs/persister-fs';
 import { MODES } from '@pollyjs/utils';
 import { LogLevelDesc } from 'loglevel';
-import path from 'path';
 import pollyJest from 'setup-polly-jest';
-import { fileURLToPath } from 'url';
 
 import { state } from '../index';
 import { getTokens } from '../ops/AuthenticateOps';
@@ -15,8 +13,6 @@ const { setupPolly } = pollyJest;
 
 Polly.register(NodeHttpAdapter);
 Polly.register(FSPersister);
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 let recordIfMissing = false;
 let mode = MODES.REPLAY;
